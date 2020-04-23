@@ -1,0 +1,11 @@
+version: '2.3'
+services:
+  base:
+    image: registry.insight-centre.org/sit/mps/docker-images/base-services:latest
+    command: echo "ok"
+    build:
+      context: './base-services'
+      dockerfile: 'Dockerfile'
+      args:
+        SIT_PYPI_USER_VAR: ${SIT_PYPI_USER}
+        SIT_PYPI_PASS_VAR: ${SIT_PYPI_PASS}
