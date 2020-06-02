@@ -9,3 +9,15 @@ services:
       args:
         SIT_PYPI_USER_VAR: ${SIT_PYPI_USER}
         SIT_PYPI_PASS_VAR: ${SIT_PYPI_PASS}
+  base-tf:
+    image: registry.insight-centre.org/sit/mps/docker-images/base-services-tf-gpu:latest
+    command: echo "ok"
+    runtime: nvidia
+    # volumes:
+    #   - './tf-images:/service'
+    build:
+      context: './tf-images'
+      dockerfile: 'Dockerfile'
+      args:
+        SIT_PYPI_USER_VAR: ${SIT_PYPI_USER}
+        SIT_PYPI_PASS_VAR: ${SIT_PYPI_PASS}
