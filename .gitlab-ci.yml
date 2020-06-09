@@ -34,8 +34,8 @@ build tf services:
     - docker buildx inspect --bootstrap
   script:
     - update-binfmts --enable # Important: Ensures execution of other binary formats is enabled in the kernel
-    - docker buildx build --platform linux/amd64 --pull -t "$CI_REGISTRY_IMAGE"/base-services-tf-gpu:latest-amd64 --push --build-arg SIT_PYPI_USER_VAR="$SIT_PYPI_USER" --build-arg SIT_PYPI_PASS_VAR="$SIT_PYPI_PASS" -f ./tf-images/Dockerfile ./tf-images
-    - docker buildx build --platform linux/arm64 --pull -t "$CI_REGISTRY_IMAGE"/base-services-tf-gpu:latest-arm64 --push --build-arg SIT_PYPI_USER_VAR="$SIT_PYPI_USER" --build-arg SIT_PYPI_PASS_VAR="$SIT_PYPI_PASS" -f /tf-images/Dockerfile.arm64 ./tf-images
+    # - docker buildx build --platform linux/amd64 --pull -t "$CI_REGISTRY_IMAGE"/base-services-tf-gpu:latest-amd64 --push --build-arg SIT_PYPI_USER_VAR="$SIT_PYPI_USER" --build-arg SIT_PYPI_PASS_VAR="$SIT_PYPI_PASS" -f ./tf-images/Dockerfile ./tf-images
+    - docker buildx build --platform linux/arm64 --pull -t "$CI_REGISTRY_IMAGE"/base-services-tf-gpu:latest-arm64 --push --build-arg SIT_PYPI_USER_VAR="$SIT_PYPI_USER" --build-arg SIT_PYPI_PASS_VAR="$SIT_PYPI_PASS" -f ./tf-images/Dockerfile.arm64 ./tf-images
     - DOCKER_BUILD_KIT=1 DOCKER_CLI_EXPERIMENTAL=enabled docker manifest create "$CI_REGISTRY_IMAGE"/base-services-tf-gpu:testing "$CI_REGISTRY_IMAGE"/base-services-tf-gpu:latest-amd64 "$CI_REGISTRY_IMAGE"/base-services-tf-gpu:latest-arm64
     - DOCKER_BUILD_KIT=1 DOCKER_CLI_EXPERIMENTAL=enabled docker manifest push --purge "$CI_REGISTRY_IMAGE"/base-services-tf-gpu:testing
   when: manual
