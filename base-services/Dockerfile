@@ -8,6 +8,9 @@ ENV PIP_VERSION_TO_INSTALL="18.1"
 ENV SIT_PYPI_USER $SIT_PYPI_USER_VAR
 ENV SIT_PYPI_PASS $SIT_PYPI_PASS_VAR
 
+WORKDIR /service
+ADD ./Pipfile /service/Pipfile
+
 RUN apt-get update \
     && apt-get install -y \
         build-essential \
@@ -27,4 +30,7 @@ RUN apt-get update \
         libpq-dev \
     && rm -rf /var/lib/apt/lists/* && \
     pip install -U pip==${PIP_VERSION_TO_INSTALL} && \
-    pip install -U pipenv==${PIPENV_VERSION_TO_INSTALL}
+    pip install -U pipenv==${PIPENV_VERSION_TO_INSTALL} && \
+    rm -f Pipfile.lock && pipenv lock -vvv && pipenv --rm && \
+    pipenv install --system  && \
+    rm -rf /tmp/pip* /root/.cache
