@@ -1,0 +1,11 @@
+FROM registry.insight-centre.org/sit/mps/docker-images/tf-grpcio-numpy-ocv-pillow-arm64:latest
+
+ARG SIT_PYPI_USER_VAR
+ARG SIT_PYPI_PASS_VAR
+ENV SIT_PYPI_USER $SIT_PYPI_USER_VAR
+ENV SIT_PYPI_PASS $SIT_PYPI_PASS_VAR
+
+ENV LC_ALL=C.UTF-8
+ENV LANG=C.UTF-8
+
+CMD ["python"]

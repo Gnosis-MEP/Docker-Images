@@ -3,7 +3,7 @@ variables:
   DOCKER_DRIVER: overlay2
   DOCKER_TLS_CERTDIR: ""
 
-build:
+build Base services:
   image: jonoh/docker-buildx-qemu
   stage: build
   services:
@@ -17,6 +17,27 @@ build:
   script:
     - update-binfmts --enable # Important: Ensures execution of other binary formats is enabled in the kernel
     - docker buildx build --platform linux/arm64,local --pull -t "$CI_REGISTRY_IMAGE"/base-services:latest --push --build-arg SIT_PYPI_USER_VAR="$SIT_PYPI_USER" --build-arg SIT_PYPI_PASS_VAR="$SIT_PYPI_PASS" ./base-services
+  when: manual
+  tags:
+    - multiarch
 
+build tf services:
+  image: jonoh/docker-buildx-qemu
+  stage: build
+  services:
+    - docker:19.03.0-dind
+  before_script:
+    - docker info
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+    # Use docker-container driver to allow useful features (push/multi-platform)
+    - docker buildx create --driver docker-container --use
+    - docker buildx inspect --bootstrap
+  script:
+    - update-binfmts --enable # Important: Ensures execution of other binary formats is enabled in the kernel
+    - docker buildx build --platform linux/amd64 --pull -t "$CI_REGISTRY_IMAGE"/base-services-tf-gpu:latest-amd64 --push --build-arg SIT_PYPI_USER_VAR="$SIT_PYPI_USER" --build-arg SIT_PYPI_PASS_VAR="$SIT_PYPI_PASS" -f Dockerfile ./tf-images
+    - docker buildx build --platform linux/arm64 --pull -t "$CI_REGISTRY_IMAGE"/base-services-tf-gpu:latest-arm64 --push --build-arg SIT_PYPI_USER_VAR="$SIT_PYPI_USER" --build-arg SIT_PYPI_PASS_VAR="$SIT_PYPI_PASS" -f Dockerfile.arm64 ./tf-images
+    - DOCKER_BUILD_KIT=1 DOCKER_CLI_EXPERIMENTAL=enabled docker manifest create "$CI_REGISTRY_IMAGE"/base-services-tf-gpu:testing "$CI_REGISTRY_IMAGE"/base-services-tf-gpu:latest-amd64 "$CI_REGISTRY_IMAGE"/base-services-tf-gpu:latest-arm64
+    - DOCKER_BUILD_KIT=1 DOCKER_CLI_EXPERIMENTAL=enabled docker manifest push --purge "$CI_REGISTRY_IMAGE"/base-services-tf-gpu:testing
+  when: manual
   tags:
     - multiarch
