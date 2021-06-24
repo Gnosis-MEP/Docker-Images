@@ -1,0 +1,21 @@
+FROM nvidia/cuda:10.1-cudnn7-runtime-ubuntu18.04
+
+ARG SIT_PYPI_USER_VAR
+ARG SIT_PYPI_PASS_VAR
+
+ENV PIP_VERSION_TO_INSTALL="21.1.2"
+ENV SIT_PYPI_USER=$SIT_PYPI_USER_VAR
+ENV SIT_PYPI_PASS=$SIT_PYPI_PASS_VAR
+ENV LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH
+
+RUN apt-get update \
+    && apt-get install -y software-properties-common unzip \
+    && add-apt-repository ppa:deadsnakes/ppa \
+    && apt-get update \
+    && apt-get install -y python3.6 python3.6-dev python3-pip libsndfile1-dev
+
+RUN ln -sfn /usr/bin/python3.6 /usr/bin/python3 \
+    && ln -sfn /usr/bin/python3 /usr/bin/python \
+    && ln -sfn /usr/bin/pip3 /usr/bin/pip
+
+RUN pip install -U pip==${PIP_VERSION_TO_INSTALL}
