@@ -34,6 +34,7 @@ RUN apt-get update \
         wget \
         unzip \
         yasm \
+        libsm6 \
         pkg-config \
         libswscale-dev \
         libtbb2 \
